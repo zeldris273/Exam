@@ -1,0 +1,14 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+header {
+    z-index: 100;
+}
+
+.no-scroll {
+    overflow: hidden !important;
+    height: 100vh;
+  }
+  

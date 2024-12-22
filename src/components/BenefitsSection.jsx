@@ -7,6 +7,7 @@ import { FcDocument } from "react-icons/fc";
 import { SlEarphones } from "react-icons/sl";
 import Divider from './Divider'
 import Validator from '../pages/Validator'
+import { useNavigate } from 'react-router-dom'
 
 const BenefitsSection = () => {
 
@@ -18,13 +19,13 @@ const BenefitsSection = () => {
             image: Benefit1
         },
         {
-            id: 1,
+            id: 2,
             title: "FREE to use",
             paragarph: "Our online ielts test are always free. We are here to help users for study abroad, immigration and finding jobs.",
             image: Benefit2
         },
         {
-            id: 1,
+            id: 3,
             title: "Increase your TOEIC band score",
             paragarph: "Using our online test for TOEIC preparation is proven to help students improve by 500-900.",
             image: Benefit3
@@ -32,11 +33,18 @@ const BenefitsSection = () => {
     ]
 
     const [isFormVisible, setIsFormVisible] = useState(false)
+    const navigate = useNavigate()
 
     const handleClick = () => {
-        setIsFormVisible(true); 
+        const token = localStorage.getItem('token');
+        if (token) {
+            navigate("/tests")
+        } else {
+            setIsFormVisible(true);
+        }
+
     }
-    
+
     return (
         <div className='mt-20'>
             <Divider />
@@ -77,7 +85,7 @@ const BenefitsSection = () => {
             </div>
 
             <img className='mx-auto h-[200px] w-[1000px]'
-            src={Ad}
+                src={Ad}
             />
 
             <div className='flex items-center justify-center my-5'>
@@ -87,7 +95,7 @@ const BenefitsSection = () => {
             </div>
 
             {isFormVisible && (
-                <Validator setIsFormVisible ={setIsFormVisible} />
+                <Validator setIsFormVisible={setIsFormVisible} />
             )}
         </div>
     )

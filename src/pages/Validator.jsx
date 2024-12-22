@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { FaTimes } from 'react-icons/fa'
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { jwtDecode } from "jwt-decode"; 
 
-const Validator = ({ setIsFormVisible}) => {
+const Validator = ({ setIsFormVisible }) => {
     const [isVisibleRegister, setIsVisibleRegister] = useState(false)
+    const navigate = useNavigate()
 
     const handleClose = () => {
         setIsFormVisible(false)
@@ -18,18 +23,73 @@ const Validator = ({ setIsFormVisible}) => {
 
     useEffect(() => {
         document.body.style.overflow = isVisibleRegister ? 'hidden' : 'auto';
-    
+
         return () => {
             document.body.style.overflow = 'auto';
         };
     }, [isVisibleRegister]);
-    
-    
+
+    const handleRegisterSubmit = async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+        const mail = e.target.email.value;
+
+        try {
+            const response = await axios.post('http://localhost:5000/api/auth/register', {
+                username,
+                password,
+                mail,
+            });
+            toast.success(response.data.message);
+            console.log(response);
+        } catch (error) {
+            if (error.response?.data?.message === 'Username already exists') {
+                toast.error('Username already exists');
+            } else if (error.response?.data?.message === 'Email already exists') {
+                toast.error('Email already exists');
+            } else {
+                toast.error(error.response?.data?.error || 'Registration failed');
+            }
+        }
+    }
+
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
+        try {
+            const response = await axios.post('http://localhost:5000/api/auth/login', {
+                username,
+                password,
+            });
+            console.log('Login response:', response);
+            if (response && response.data  && response.data.token) {
+                const token = response.data.token; 
+                const decodedToken = jwtDecode(token);
+                localStorage.setItem('token', response.data.token); 
+                toast.success(`Welcome, ${decodedToken.username}!`);
+                handleClose()
+                console.log(response.data)
+                navigate("/profile")
+                window.location.reload();
+            }
+
+        } catch (error) {
+            console.error('Error during login request:', error);
+            toast.error(error.response?.data?.error || 'Login failed');
+        }
+    };
+
+
+
+
     return (
         <div className='fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-20'>
             {!isVisibleRegister ? (
                 // Form Đăng nhập
-                <form className='bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative'>
+                <form onSubmit={handleLoginSubmit} className='bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative'>
                     <button
                         type="button"
                         onClick={handleClose}
@@ -39,15 +99,6 @@ const Validator = ({ setIsFormVisible}) => {
                     </button>
 
                     <h2 className="text-center text-xl font-bold mb-4">Đăng nhập</h2>
-                    <div className='mb-4'>
-                        <label htmlFor="email" className="block text-gray-700">Email:</label>
-                        <input
-                            id="email"
-                            type="email"
-                            className="w-full p-1 border border-gray-300 rounded mt-1"
-                            required
-                        />
-                    </div>
 
                     <div className="mb-4">
                         <label htmlFor="username" className="block text-gray-700">Tên tài khoản:</label>
@@ -69,7 +120,17 @@ const Validator = ({ setIsFormVisible}) => {
                         />
                     </div>
 
-                    <div className="mb-4">
+                    {/* <div className='mb-4'>
+                        <label htmlFor="email" className="block text-gray-700">Email:</label>
+                        <input
+                            id="email"
+                            type="email"
+                            className="w-full p-1 border border-gray-300 rounded mt-1"
+                            required
+                        />
+                    </div> */}
+
+                    {/* <div className="mb-4">
                         <label htmlFor="otp" className="block text-gray-700">Mã OTP</label>
                         <div className='flex justify-between'>
                             <input
@@ -83,7 +144,7 @@ const Validator = ({ setIsFormVisible}) => {
                                 Lấy mã
                             </button>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className='flex justify-between -mb-4'>
                         <p className='text-gray-700 mb-4'>Bạn chưa có tài khoản?</p>
@@ -102,7 +163,7 @@ const Validator = ({ setIsFormVisible}) => {
                 </form>
             ) : (
                 // Form Đăng ký
-                <form className='bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative'>
+                <form onSubmit={handleRegisterSubmit} className='bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative'>
                     <button
                         type="button"
                         onClick={handleClose}
@@ -112,15 +173,6 @@ const Validator = ({ setIsFormVisible}) => {
                     </button>
 
                     <h2 className="text-center text-xl font-bold mb-4">Đăng ký</h2>
-                    <div className='mb-4'>
-                        <label htmlFor="email" className="block text-gray-700">Email:</label>
-                        <input
-                            id="email"
-                            type="email"
-                            className="w-full p-1 border border-gray-300 rounded mt-1"
-                            required
-                        />
-                    </div>
 
                     <div className="mb-4">
                         <label htmlFor="username" className="block text-gray-700">Tên tài khoản:</label>
@@ -137,6 +189,16 @@ const Validator = ({ setIsFormVisible}) => {
                         <input
                             id="password"
                             type="password"
+                            className="w-full p-1 border border-gray-300 rounded mt-1"
+                            required
+                        />
+                    </div>
+
+                    <div className='mb-4'>
+                        <label htmlFor="email" className="block text-gray-700">Email:</label>
+                        <input
+                            id="email"
+                            type="email"
                             className="w-full p-1 border border-gray-300 rounded mt-1"
                             required
                         />

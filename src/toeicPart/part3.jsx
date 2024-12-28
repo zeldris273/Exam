@@ -33,7 +33,7 @@ const audioAndImage = [
     { id: 68, audio: question68, image: p68 }
 ];
 
-const Part3 = () => {
+const Part3 = ({ onAnswerChange }) => {
     const [questions, setQuestions] = useState([]);
 
     useEffect(() => {
@@ -43,6 +43,10 @@ const Part3 = () => {
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
+
+    const handleAnswerChange = (questionId, answer) => {
+        onAnswerChange(questionId, answer);
+    };
 
     const groupedQuestions = [];
     for (let i = 32; i <= 61; i += 3) {
@@ -80,7 +84,12 @@ const Part3 = () => {
                                             {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
                                                 <div key={optionKey} className="mb-2">
                                                     <label className="flex items-center">
-                                                        <input type="radio" name={`answer${questionId}`} className="mr-2" />
+                                                        <input
+                                                            type="radio"
+                                                            name={`answer${questionId}`}
+                                                            className="mr-2"
+                                                            onChange={() => handleAnswerChange(questionId, question?.[optionKey])}
+                                                        />
                                                         {question?.[optionKey]}
                                                     </label>
                                                 </div>
@@ -124,7 +133,12 @@ const Part3 = () => {
                                     {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
                                         <div key={optionKey} className="mb-2">
                                             <label className="flex items-center">
-                                                <input type="radio" name={`answer${questionId}`} className="mr-2" />
+                                                <input
+                                                    type="radio"
+                                                    name={`answer${questionId}`}
+                                                    className="mr-2"
+                                                    onChange={() => handleAnswerChange(questionId, question?.[optionKey])}
+                                                />
                                                 {question?.[optionKey]}
                                             </label>
                                         </div>
@@ -137,6 +151,6 @@ const Part3 = () => {
             })}
         </div>
     );
-}
+};
 
 export default Part3;

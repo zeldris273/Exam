@@ -6,10 +6,13 @@ import Exam from "./pages/Exam";
 import User from "./pages/User";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+// import { UserProvider } from './context/UserContext.jsx'
 
 function App() {
+
   return (
     <>
+      {/* <UserProvider> */}
         <Router>
           <Routes>
             <Route path="/" element={<Layout />}>
@@ -21,6 +24,7 @@ function App() {
           </Routes>
         </Router>
         <ToastContainer />
+      {/* </UserProvider> */}
     </>
   );
 }

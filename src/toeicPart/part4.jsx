@@ -26,7 +26,7 @@ const audioAndImage = [
   { id: 98, audio: question98, image: p98 },
 ];
 
-const Part4 = () => {
+const Part4 = ({ onAnswerChange }) => {
   const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
@@ -36,6 +36,10 @@ const Part4 = () => {
       })
       .catch(error => console.error('Error fetching data:', error));
   }, []);
+
+  const handleAnswerChange = (questionId, answer) => {
+    onAnswerChange(questionId, answer);
+  };
 
   const groupedQuestions = [];
   for (let i = 71; i <= 94; i += 3) {
@@ -52,40 +56,45 @@ const Part4 = () => {
       <strong className='bg-blue-100 rounded-lg p-2 text-blue-600 flex items-center justify-center mt-10 w-[72px]'>Part 4</strong>
 
       {groupedQuestions.map((group, index) => {
-                const audioData = audioAndImage.find(data => group.includes(data.id));
-                return (
-                    <div key={index} className='mt-10'>
-                        {audioData && (
-                            <audio controls className="w-full my-10">
-                                <source src={audioData.audio} type="audio/m4a" />
-                                Trình duyệt của bạn không hỗ trợ thẻ audio.
-                            </audio>
-                        )}
+        const audioData = audioAndImage.find(data => group.includes(data.id));
+        return (
+          <div key={index} className='mt-10'>
+            {audioData && (
+              <audio controls className="w-full my-10">
+                <source src={audioData.audio} type="audio/m4a" />
+                Trình duyệt của bạn không hỗ trợ thẻ audio.
+              </audio>
+            )}
 
-                        {group.map((questionId) => {
-                            const question = questions.find(q => q.id === questionId);
-                            return (
-                                <div key={questionId} className='flex items-start mt-5'>
-                                    <strong className='bg-blue-100 rounded-full p-2 text-blue-600 mr-5 flex items-center justify-center w-[35px] h-[35px]'>{questionId}</strong>
-                                    <div className='flex flex-col'>
-                                        <p>{question?.content}</p>
-                                        <div>
-                                            {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
-                                                <div key={optionKey} className="mb-2">
-                                                    <label className="flex items-center">
-                                                        <input type="radio" name={`answer${questionId}`} className="mr-2" />
-                                                        {question?.[optionKey]}
-                                                    </label>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+            {group.map((questionId) => {
+              const question = questions.find(q => q.id === questionId);
+              return (
+                <div key={questionId} className='flex items-start mt-5'>
+                  <strong className='bg-blue-100 rounded-full p-2 text-blue-600 mr-5 flex items-center justify-center w-[35px] h-[35px]'>{questionId}</strong>
+                  <div className='flex flex-col'>
+                    <p>{question?.content}</p>
+                    <div>
+                      {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
+                        <div key={optionKey} className="mb-2">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name={`answer${questionId}`}
+                              className="mr-2"
+                              onChange={() => handleAnswerChange(questionId, optionKey)}
+                            />
+                            {question?.[optionKey]}
+                          </label>
+                        </div>
+                      ))}
                     </div>
-                );
+                  </div>
+                </div>
+              );
             })}
+          </div>
+        );
+      })}
 
       {allQuestions.map((questionId) => {
         const question = questions.find(q => q.id === questionId);
@@ -117,7 +126,12 @@ const Part4 = () => {
                   {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
                     <div key={optionKey} className="mb-2">
                       <label className="flex items-center">
-                        <input type="radio" name={`answer${questionId}`} className="mr-2" />
+                        <input
+                          type="radio"
+                          name={`answer${questionId}`}
+                          className="mr-2"
+                          onChange={() => handleAnswerChange(questionId, optionKey)}
+                        />
                         {question?.[optionKey]}
                       </label>
                     </div>
@@ -129,7 +143,7 @@ const Part4 = () => {
         );
       })}
     </div>
-  )
-}
+  );
+};
 
 export default Part4;

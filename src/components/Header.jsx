@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaRegUserCircle } from 'react-icons/fa'; // Import user icon
+import { FaRegUserCircle } from 'react-icons/fa'; 
 import { Link, NavLink } from 'react-router-dom';
 import Logo from '../assets/logo.png';
 import Validator from '../pages/Validator';
@@ -7,11 +7,10 @@ import Validator from '../pages/Validator';
 const Header = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isMenuVisible, setIsMenuVisible] = useState(false); // State to manage dropdown visibility
-  const [timeoutId, setTimeoutId] = useState(null); // State to hold timeout ID
+  const [isMenuVisible, setIsMenuVisible] = useState(false); 
+  const [timeoutId, setTimeoutId] = useState(null);
 
   useEffect(() => {
-    // Check if the token exists in localStorage to determine if the user is logged in
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
   }, []);
@@ -21,25 +20,22 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token on logout
-    setIsLoggedIn(false); // Update login state
-    // Redirect to login page or home
+    localStorage.removeItem('token'); 
+    setIsLoggedIn(false); 
   };
 
-  // Handle mouse enter event
   const handleMouseEnter = () => {
     if (timeoutId) {
-      clearTimeout(timeoutId); // Clear any existing timeout
+      clearTimeout(timeoutId);
     }
-    setIsMenuVisible(true); // Show menu immediately when mouse enters
+    setIsMenuVisible(true); 
   };
 
-  // Handle mouse leave event with a delay
   const handleMouseLeave = () => {
     const id = setTimeout(() => {
-      setIsMenuVisible(false); // Hide menu after a short delay
-    }, 300); // Set delay time (in milliseconds)
-    setTimeoutId(id); // Save the timeout ID to clear if needed
+      setIsMenuVisible(false); 
+    }, 300); 
+    setTimeoutId(id); 
   };
 
   return (
@@ -47,7 +43,7 @@ const Header = () => {
       <header className='fixed top-0 w-full h-14 bg-neutral-100'>
         <div className='container mx-auto flex items-center h-full justify-between'>
           <Link to="/">
-            <img src={Logo} width={120} />
+            <img src={Logo} width={100} />
           </Link>
 
           <div className='flex items-center gap-2 ml-5'>
@@ -57,7 +53,6 @@ const Header = () => {
               </span>
             </NavLink>
 
-            {/* Conditionally render the button or user icon */}
             {!isLoggedIn ? (
               <button
                 onClick={handleClick}
@@ -68,12 +63,11 @@ const Header = () => {
             ) : (
               <div
                 className="relative"
-                onMouseEnter={handleMouseEnter} // Show menu on hover
-                onMouseLeave={handleMouseLeave} // Hide menu after delay
+                onMouseEnter={handleMouseEnter} 
+                onMouseLeave={handleMouseLeave} 
               >
                 <FaRegUserCircle className="text-2xl text-gray-700 cursor-pointer" />
 
-                {/* Conditionally render dropdown */}
                 {isMenuVisible && (
                   <div className="absolute right-0 mt-2 w-52 bg-white border rounded-md shadow-lg z-10">
                     <ul className="py-2">

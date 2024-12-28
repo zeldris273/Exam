@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const User = () => {
     const [userInfo, setUserInfo] = useState(null);
+    const [isFaceRegistered, setIsFaceRegistered] = useState(false);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         hoten: '',
@@ -34,7 +35,7 @@ const User = () => {
             });
         } else {
             console.log("No token found, redirect to login page");
-            navigate('/')
+            navigate('/');
             toast.error("Bạn cần đăng nhập trước!");
         }
     }, []);
@@ -68,7 +69,30 @@ const User = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSave = async () => {
+    useEffect(() => {
+        const checkFacialId = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await axios.get('http://localhost:5000/api/auth/check-facial-id', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (response.status === 200) {
+                    setIsFaceRegistered(response.data.isFaceRegistered);
+                }
+            } catch (error) {
+                console.error('Error checking facialId:', error);
+            }
+        };
+
+        checkFacialId();
+    }, []);
+
+
+    const handleSave = async (e) => {
+        e.preventDefault();
         const token = localStorage.getItem('token');
         console.log(token);
 
@@ -87,11 +111,16 @@ const User = () => {
                 toast.success('Cập nhật thông tin thành công!');
                 setUserInfo({ ...userInfo, ...formData });
             } else {
-                alert('Cập nhật thất bại!');
+                toast.error('Cập nhật thất bại!');
             }
         } catch (error) {
-            console.error('Error saving data:', error);
-            toast.error('Có lỗi xảy ra trong quá trình lưu.');
+            if (error.response?.data?.message === 'CCCD must be exactly 12 digits') {
+                toast.error('Số CCCD phải đủ 12 số');
+            } else if (error.response?.data?.message === 'CCCD already exists') {
+                toast.error('CCCD đã tồn tại');
+            } else {
+                toast.error('Có lỗi xảy ra trong quá trình lưu.');
+            }
         }
     };
 
@@ -115,7 +144,7 @@ const User = () => {
                 <h1 className='text-xl font-bold uppercase mt-5 mb-5'>Thông tin thí sinh</h1>
 
                 {/* Form thông tin thí sinh */}
-                <div className='flex flex-col w-[400px]' style={{ border: '1.5px solid gray', padding: '10px' }}>
+                <form className='flex flex-col w-[400px]' style={{ border: '1.5px solid gray', padding: '10px' }} onSubmit={handleSave}>
 
                     {/* Họ tên */}
                     <div className='flex flex-col mb-4'>
@@ -125,6 +154,7 @@ const User = () => {
                             name='hoten'
                             value={formData.hoten}
                             onChange={handleChange}
+                            required
                             className="w-[250px] p-1 border border-gray-300 rounded mt-1"
                         />
                     </div>
@@ -138,6 +168,7 @@ const User = () => {
                                     type='radio'
                                     name='gioitinh'
                                     value='M'
+                                    required
                                     checked={formData.gioitinh === 'M'}
                                     onChange={handleChange}
                                     className="mr-2"
@@ -148,6 +179,7 @@ const User = () => {
                                     type='radio'
                                     name='gioitinh'
                                     value='F'
+                                    required
                                     checked={formData.gioitinh === 'F'}
                                     onChange={handleChange}
                                     className="mr-2"
@@ -163,6 +195,7 @@ const User = () => {
                             type="date"
                             id="birthdate"
                             name="ngaysinh"
+                            required
                             value={formData.ngaysinh}
                             onChange={handleChange}
                             className="w-[250px] p-1 border border-gray-300 rounded mt-1"
@@ -176,19 +209,31 @@ const User = () => {
                             type='text'
                             name='cccd'
                             value={formData.cccd}
+                            required
                             onChange={handleChange}
                             className="w-[250px] p-1 border border-gray-300 rounded mt-1"
                         />
                     </div>
 
+                    {isFaceRegistered ? (
+                        <div className='text-green-500 text-center mb-2'>Đã xác thực khuôn mặt</div>
+                    ) : (
+                        <button
+                            type='button'
+                            className='py-3 px-30 bg-green-400 text-white w-[150px] mx-auto mb-3 rounded-md'
+                        >
+                            Đăng ký khuôn mặt
+                        </button>
+                    )}
+
                     <button
+                        type="submit"
                         className='mx-auto px-6 py-2 bg-blue-700 rounded-md hover:bg-blue-800 text-white w-[150px]'
-                        onClick={handleSave}
                     >
                         Lưu
                     </button>
 
-                </div>
+                </form>
             </div>
         </div>
     );

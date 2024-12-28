@@ -9,6 +9,7 @@ const Footer = () => {
         <img
           src={Logo}
           width={120}
+          className='mt-10'
         />
         <Link className='hover:underline' to='/'> Về chúng tôi | </Link>
         <Link className='hover:underline' to='/'>Điều khoản sử dụng | </Link>

@@ -4,7 +4,7 @@ const pool = require('../models/db');
 
 // Đăng ký người dùng
 const register = async (req, res) => {
-    const { username, password, mail, cccd } = req.body;
+    const { username, password, mail, facialId} = req.body;
 
     try {
         const userCheck = await pool.query('SELECT * FROM accountuser WHERE username = $1', [username]);
@@ -19,8 +19,8 @@ const register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         await pool.query(
-            'INSERT INTO accountuser (username, password, mail, cccd) VALUES ($1, $2, $3, $4)',
-            [username, hashedPassword, mail, cccd]
+            'INSERT INTO accountuser (username, password, mail, facialId) VALUES ($1, $2, $3, $4)',
+            [username, hashedPassword, mail, facialId]
         );
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
@@ -47,8 +47,8 @@ const login = async (req, res) => {
             [user.id]
         );
 
-        const token = jwt.sign({ id: user.id, username: user.username }, 'your_jwt_secret', { expiresIn: '1h' });
-        res.status(200).json({ token, message: 'Login successful' });
+       // const token = jwt.sign({ id: user.id, username: user.username }, 'your_jwt_secret', { expiresIn: '1h' });
+        res.status(200).json({ message: 'Login successful' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -59,7 +59,6 @@ const setChange = async (req, res) => {
     const { hoten, gioitinh, ngaysinh, cccd } = req.body;
     const cccdRegex = /^[0-9]{12}$/;
 
-    // Validate CCCD format
     if (!cccdRegex.test(cccd)) {
         return res.status(400).json({ message: 'CCCD must be exactly 12 digits' });
     }
@@ -67,7 +66,10 @@ const setChange = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        const cccdCheck = await pool.query('SELECT * FROM accountuser WHERE cccd = $1 AND id != $2', [cccd, userId]);
+        const cccdCheck = await pool.query(
+            'SELECT * FROM accountuser WHERE cccd = $1 AND id != $2',
+            [cccd, userId]
+        );
         if (cccdCheck.rows.length > 0) {
             return res.status(400).json({ message: 'CCCD already exists' });
         }
@@ -78,14 +80,42 @@ const setChange = async (req, res) => {
             WHERE id = $5
         `;
         const values = [hoten, gioitinh, ngaysinh, cccd, userId];
-
         await pool.query(query, values);
-        res.status(200).json({ message: 'Update successful' });
+
+        const userResult = await pool.query(
+            'SELECT id, hoten, gioitinh, ngaysinh, cccd, facialid FROM accountuser WHERE id = $1',
+            [userId]
+        );
+        const updatedUser = userResult.rows[0];
+
+        try {
+            const newToken = jwt.sign(
+                {
+                    id: updatedUser.id,
+                    hoten: updatedUser.hoten,
+                    gioitinh: updatedUser.gioitinh,
+                    ngaysinh: updatedUser.ngaysinh,
+                    cccd: updatedUser.cccd,
+                    facialId: updatedUser.facialid, 
+                },
+                'your_jwt_secret',
+                { expiresIn: '1h' }
+            );
+    
+            return res.status(200).json({
+                message: 'Update successful',
+                token: newToken,
+            });
+        } catch (jwtError) {
+            console.error('Error generating token:', jwtError);
+            return res.status(500).json({ error: 'Error generating token' });
+        }
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Error updating user' });
+        return res.status(500).json({ error: 'Error updating user' });
     }
 };
+
 
 // Hiển thị thông tin người dùng
 const showInfo = async (req, res) => {
@@ -105,18 +135,18 @@ const showInfo = async (req, res) => {
 };
 
 // Cập nhật Facial ID của người dùng
-const updateFacialId = async (req, res) => {
-    const { facialId } = req.body;
-    const userId = req.user.id;
+// const updateFacialId = async (req, res) => {
+//     const { facialId } = req.body;
+//     const userId = req.user.id;
 
-    try {
-        await pool.query('UPDATE accountuser SET facialId = $1 WHERE id = $2', [facialId, userId]);
-        res.status(200).json({ message: 'Facial ID updated successfully' });
-    } catch (error) {
-        console.error('Error updating Facial ID:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-};
+//     try {
+//         await pool.query('UPDATE accountuser SET facialId = $1 WHERE id = $2', [facialId, userId]);
+//         res.status(200).json({ message: 'Facial ID updated successfully' });
+//     } catch (error) {
+//         console.error('Error updating Facial ID:', error);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// };
 
 // Đăng nhập bằng nhận diện khuôn mặt
 const faceLogin = async (req, res) => {
@@ -160,4 +190,4 @@ const checkFacialID = async (req, res) => {
 };
 
 
-module.exports = { register, login, setChange, showInfo, updateFacialId, faceLogin, checkFacialID };
+module.exports = { register, login, setChange, showInfo, faceLogin, checkFacialID };

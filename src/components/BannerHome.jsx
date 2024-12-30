@@ -54,7 +54,7 @@ const BannerHome = () => {
                             <img
                                 src={banner.image}
                                 alt={banner.title}
-                                className="h-[394px] w-full object-cover"
+                                className="h-[394px] w-full object-fit"
                             />
                         </div>
                     </div>

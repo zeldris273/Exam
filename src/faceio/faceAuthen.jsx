@@ -32,7 +32,6 @@ export const faceSignIn = async () => {
     });
     console.log(userData);
     console.log('Unique Facial ID: ', userData.facialId);
-    console.log('PayLoad: ', userData.payload);
 
     const response = await axios.post('http://localhost:5000/api/auth/faceLogin', {
       facialId: userData.facialId,

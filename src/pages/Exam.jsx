@@ -101,6 +101,7 @@ const Exam = () => {
         score,
       });
       alert(`Total Score: ${score}`);
+      navigate("/tests")
     } catch (error) {
       console.error('Error saving score:', error);
     }

@@ -15,27 +15,12 @@ export const faceRegistration = async () => {
       locale: "auto",
     });
 
-    const facialId = userInfo.facialId;
-    const token = localStorage.getItem('token');
-
-    await axios.post('http://localhost:5000/api/auth/user/updateFacialId', {
-      facialId: facialId,
-    }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    console.log(userInfo);
     console.log('Unique Facial ID: ', userInfo.facialId);
-    console.log('Enrollment Date: ', userInfo.timestamp);
-    console.log('Gender: ', userInfo.details.gender);
-    console.log('Age Approximation: ', userInfo.details.age);
-
-
+    return userInfo.facialId;
   } catch (errorCode) {
     console.log(errorCode);
     handleError(errorCode);
+    return false
   }
 };
 

@@ -1,19 +1,44 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FiClock } from "react-icons/fi";
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
 
 const TestList = () => {
     const navigate = useNavigate();
-    
+
     const handleStartTest = () => {
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error("Bạn cần đăng nhập trước!");
             return;
         }
+    
+        let user;
+        try {
+            user = jwtDecode(token);
+            console.log(user);
+        } catch (error) {
+            toast.error("Token không hợp lệ. Bạn cần đăng nhập lại.");
+            console.error("Error decoding token:", error);
+            return;
+        }
+    
+        const { hoten, cccd, gioitinh, ngaysinh, facialId } = user;
+        console.log("Họ tên:", hoten);
+        console.log("CCCD:", cccd);
+        console.log("Giới tính:", gioitinh);
+        console.log("Ngày sinh:", ngaysinh);
+        console.log("Facial ID:", facialId);
+    
+        if (!hoten || !cccd || !gioitinh || !ngaysinh || !facialId) {
+            toast.error("Bạn cần hoàn thành thông tin cá nhân trước khi luyện tập.");
+            return;
+        }
+    
         navigate('/exam');
     };
+    
 
     return (
         <>

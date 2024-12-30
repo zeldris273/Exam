@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {jwtDecode} from 'jwt-decode';
-import { faceSignIn } from '../faceio/faceAuthen';
+import { faceSignIn, faceRegistration } from '../faceio/faceAuthen';
 
 const Validator = ({ setIsFormVisible }) => {
     const [isVisibleRegister, setIsVisibleRegister] = useState(false);
@@ -38,11 +38,18 @@ const Validator = ({ setIsFormVisible }) => {
         const password = e.target.password.value;
         const mail = e.target.email.value;
 
+        setIsFaceIOActive(true)
+
         try {
+            const facialId = await faceRegistration();
+            if (!facialId) {
+                toast.error(error.response?.data?.error || 'Registration failed');
+            }
             const response = await axios.post('http://localhost:5000/api/auth/register', {
                 username,
                 password,
                 mail,
+                facialId
             });
             toast.success(response.data.message);
             console.log(response);
@@ -61,38 +68,35 @@ const Validator = ({ setIsFormVisible }) => {
         e.preventDefault();
         const username = e.target.username.value;
         const password = e.target.password.value;
-
+    
         setIsFaceIOActive(true);
-
+    
         try {
             const response = await axios.post('http://localhost:5000/api/auth/login', {
                 username,
                 password,
             });
             console.log('Login response:', response);
-
-            if (response && response.data && response.data.token) {
+    
+            if (response && response.data && response.data.message === 'Login successful') {
                 const faceAuthSuccess = await faceSignIn();
-
+    
                 if (faceAuthSuccess) {
-                    const token = response.data.token;
-                    const decodedToken = jwtDecode(token);
-                    localStorage.setItem('token', response.data.token);
-                    toast.success(`Welcome, ${decodedToken.username}!`);
+                    toast.success(`Welcome, ${username}!`);
                     handleClose();
-                    console.log(response.data);
                     navigate("/profile");
                     window.location.reload();
                 } else {
                     toast.error('Lỗi xác thực FaceIo');
-                    window.location.reload();
                 }
-                setIsFaceIOActive(false)
-
+            } else {
+                toast.error('Đăng nhập thất bại!');
             }
         } catch (error) {
             console.error('Error during login request:', error);
             toast.error(error.response?.data?.error || 'Login failed');
+        } finally {
+            setIsFaceIOActive(false);
         }
     };
 
@@ -158,6 +162,7 @@ const Validator = ({ setIsFormVisible }) => {
                     </button>
 
                     <h2 className="text-center text-xl font-bold mb-4">Đăng ký</h2>
+                    <h3 className="text-center text-xl font-bold mb-4 -mt-2">(Face Registration)</h3>
 
                     <div className="mb-4">
                         <label htmlFor="username" className="block text-gray-700">Tên tài khoản:</label>

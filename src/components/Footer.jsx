@@ -17,7 +17,7 @@ const Footer = () => {
       </div>
       <div className="text-center text-white -mt-12">
         <p>Email: support@example.com</p>
-        <p>Phone: +123 456 789</p>
+        <p>Phone: 0792497018</p>
         <p className='text-white text-center'>© 2024 Your Company. All rights reserved.</p>
         <p className='text-white text-center'>Created by Ngũ Đại Kage.</p>
       </div>

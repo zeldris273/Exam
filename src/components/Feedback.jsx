@@ -10,7 +10,7 @@ const Feedback = () => {
 
     const customerFeedback = [
         {
-            id: 1, image: Jake, name: 'Trần Hữu Phúc', p: 'Ngờ ngudaikage, tôi mới biết tôi là bố TOEIC.'
+            id: 1, image: Jake, name: 'Trần Hữu Phúc', p: 'Nhờ ngudaikage, tôi mới biết tôi là bố TOEIC.'
         },
         {
             id: 2, image: BaoLoi, name: 'Nguyễn Bảo Lợi', p: 'Nhờ ngudaikage tôi có thể làm trong 5p và ngủ trong 115p còn lại.'

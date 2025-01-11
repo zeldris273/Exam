@@ -1,14 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
 import TestList from "./pages/TestList";
 import Exam from "./pages/Exam";
 import User from "./pages/User";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Header from "./components/Header";
-import Footer from "./components/Footer";
+import HomeWithFooter from "./components/HomeWithFooter";
 
 function App() {
+
+
   return (
     <>
       <Router>
@@ -27,11 +28,5 @@ function App() {
   );
 }
 
-const HomeWithFooter = () => (
-  <>
-    <Home />
-    <Footer />
-  </>
-);
 
 export default App;

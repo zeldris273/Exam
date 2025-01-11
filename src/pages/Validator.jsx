@@ -3,12 +3,11 @@ import { FaTimes } from 'react-icons/fa'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { jwtDecode } from "jwt-decode"; 
-
-//Github ngu vcl
+import { jwtDecode } from "jwt-decode";
 
 const Validator = ({ setIsFormVisible }) => {
     const [isVisibleRegister, setIsVisibleRegister] = useState(false)
+    const [otpToken, setOtpToken] = useState("");
     const navigate = useNavigate()
 
     const handleClose = () => {
@@ -35,26 +34,37 @@ const Validator = ({ setIsFormVisible }) => {
         e.preventDefault();
         const username = e.target.username.value;
         const password = e.target.password.value;
-        const mail = e.target.email.value;
+        const email = e.target.email.value;
+        const otp = e.target.otp.value;
 
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/register', {
-                username,
-                password,
-                mail,
+            const otpResponse = await axios.post('http://localhost:5000/api/verify-otp', {
+                email,
+                otp,
+                otpToken
             });
-            toast.success(response.data.message);
-            console.log(response);
+
+            if (otpResponse.status === 200) {
+                const response = await axios.post('http://localhost:5000/api/auth/register', {
+                    username,
+                    password,
+                    email,
+                });
+                toast.success(response.data.message);
+                setIsFormVisible(false);
+            }
         } catch (error) {
             if (error.response?.data?.message === 'Username already exists') {
                 toast.error('Username already exists');
             } else if (error.response?.data?.message === 'Email already exists') {
                 toast.error('Email already exists');
+            } else if (error.response?.data?.message === 'Invalid OTP' || error.response?.data?.message === 'Invalid or expired OTP token') {
+                toast.error('Invalid or expired OTP');
             } else {
                 toast.error(error.response?.data?.error || 'Registration failed');
             }
         }
-    }
+    };
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
@@ -67,15 +77,15 @@ const Validator = ({ setIsFormVisible }) => {
                 password,
             });
             console.log('Login response:', response);
-            if (response && response.data  && response.data.token) {
-                const token = response.data.token; 
+            if (response && response.data && response.data.token) {
+                const token = response.data.token;
                 const decodedToken = jwtDecode(token);
-                localStorage.setItem('token', response.data.token); 
-                toast.success(`Welcome, ${decodedToken.username}!`);
+                localStorage.setItem('token', response.data.token);
                 handleClose()
                 console.log(response.data)
                 navigate("/profile")
                 window.location.reload();
+                toast.success(`Welcome, ${decodedToken.username}!`);
             }
 
         } catch (error) {
@@ -85,7 +95,25 @@ const Validator = ({ setIsFormVisible }) => {
     };
 
 
+    const handleOTP = async (e) => {
+        try {
+            e.preventDefault()
+            const emailInput = document.getElementById('email');
+            const email = emailInput.value;
+            const response = await axios.post('http://localhost:5000/api/send-otp', {
+                email
+            })
+            setOtpToken(response.data.otpToken);
+            const decode = jwtDecod(response.data.otpToken)
+            console.log("OTP Token:", decode);
+            toast.success('OTP sent to your email. Please enter the OTP to complete registration.')
+        } catch (error) {
+            if (error.response?.data?.message === 'Email already exists') {
+                toast.error('Email already exists');
+            }
+        }
 
+    }
 
     return (
         <div className='fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-20'>
@@ -130,22 +158,6 @@ const Validator = ({ setIsFormVisible }) => {
                             className="w-full p-1 border border-gray-300 rounded mt-1"
                             required
                         />
-                    </div> */}
-
-                    {/* <div className="mb-4">
-                        <label htmlFor="otp" className="block text-gray-700">Mã OTP</label>
-                        <div className='flex justify-between'>
-                            <input
-                                id="otp"
-                                type="text"
-                                className="w-[150px] p-1 border border-gray-300 rounded mt-1"
-                                placeholder="Nhập mã OTP"
-                                required
-                            />
-                            <button className="w-[100px] p-1 bg-blue-500 text-white rounded hover:bg-blue-700">
-                                Lấy mã
-                            </button>
-                        </div>
                     </div> */}
 
                     <div className='flex justify-between -mb-4'>
@@ -204,6 +216,25 @@ const Validator = ({ setIsFormVisible }) => {
                             className="w-full p-1 border border-gray-300 rounded mt-1"
                             required
                         />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="otp" className="block text-gray-700">Mã OTP</label>
+                        <div className='flex justify-between'>
+                            <input
+                                id="otp"
+                                type="text"
+                                className="w-[150px] p-1 border border-gray-300 rounded mt-1"
+                                placeholder="Nhập mã OTP"
+                                required
+                            />
+                            <button
+                                type='button'
+                                onClick={handleOTP}
+                                className="w-[100px] p-1 bg-blue-500 text-white rounded hover:bg-blue-700">
+                                Lấy mã
+                            </button>
+                        </div>
                     </div>
 
                     <div className='flex justify-between'>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaRegUserCircle } from 'react-icons/fa'; // Import user icon
+import { FaRegUserCircle } from 'react-icons/fa'; 
 import { Link, NavLink } from 'react-router-dom';
 import Logo from '../assets/logo.png';
 import Validator from '../pages/Validator';
@@ -7,39 +7,39 @@ import Validator from '../pages/Validator';
 const Header = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isMenuVisible, setIsMenuVisible] = useState(false); // State to manage dropdown visibility
-  const [timeoutId, setTimeoutId] = useState(null); // State to hold timeout ID
+  const [isMenuVisible, setIsMenuVisible] = useState(false); 
+  const [timeoutId, setTimeoutId] = useState(null); 
 
   useEffect(() => {
-    // Check if the token exists in localStorage to determine if the user is logged in
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
   }, []);
+
+  useEffect(() => {
+   
+  }, [isMenuVisible, isLoggedIn])
 
   const handleClick = () => {
     setIsFormVisible(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token on logout
-    setIsLoggedIn(false); // Update login state
-    // Redirect to login page or home
+    localStorage.removeItem('token'); 
+    setIsLoggedIn(false);
   };
 
-  // Handle mouse enter event
   const handleMouseEnter = () => {
     if (timeoutId) {
-      clearTimeout(timeoutId); // Clear any existing timeout
+      clearTimeout(timeoutId); 
     }
-    setIsMenuVisible(true); // Show menu immediately when mouse enters
+    setIsMenuVisible(true); 
   };
 
-  // Handle mouse leave event with a delay
   const handleMouseLeave = () => {
     const id = setTimeout(() => {
-      setIsMenuVisible(false); // Hide menu after a short delay
-    }, 300); // Set delay time (in milliseconds)
-    setTimeoutId(id); // Save the timeout ID to clear if needed
+      setIsMenuVisible(false); 
+    }, 300); 
+    setTimeoutId(id);
   };
 
   return (

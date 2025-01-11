@@ -3,6 +3,7 @@ import { FiClock } from "react-icons/fi";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 const tests = [
     {
@@ -35,36 +36,30 @@ const tests = [
 const TestList = () => {
     const navigate = useNavigate();
 
-    const handleStartTest = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.error("Bạn cần đăng nhập trước!");
-            return;
-        }
-
-        let user;
+    const handleStartTest = async () => {
         try {
-            user = jwtDecode(token);
-            console.log(user);
+            const token = localStorage.getItem('token');
+            const decode = jwtDecode(token)
+            if (!token) {
+                console.log("No token found, redirect to login page");
+                return;
+            }
+
+            const response = await axios.get('http://localhost:5000/api/auth/user', {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+
+            if (response.status === 204) {
+                toast.error('Bạn cần hoàn thành thông tin cá nhân trước khi luyện tập.')
+                return
+            } else if (response.status === 200) {
+                navigate("/exam")
+            }
+
         } catch (error) {
-            toast.error("Token không hợp lệ. Bạn cần đăng nhập lại.");
-            console.error("Error decoding token:", error);
-            return;
+            console.error('Error fetching user info:', error);
+            toast.error('Bạn cần hoàn thành thông tin cá nhân trước khi luyện tập.')
         }
-
-        const { hoten, cccd, gioitinh, ngaysinh, facialId } = user;
-        console.log("Họ tên:", hoten);
-        console.log("CCCD:", cccd);
-        console.log("Giới tính:", gioitinh);
-        console.log("Ngày sinh:", ngaysinh);
-        console.log("Facial ID:", facialId);
-
-        if (!hoten || !cccd || !gioitinh || !ngaysinh || !facialId) {
-            toast.error("Bạn cần hoàn thành thông tin cá nhân trước khi luyện tập.");
-            return;
-        }
-
-        navigate('/exam');
     };
 
     return (

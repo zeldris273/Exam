@@ -56,6 +56,11 @@ const Validator = ({ setIsFormVisible }) => {
         } catch (error) {
             if (error.response?.data?.message === 'Username already exists') {
                 toast.error('Username already exists');
+            } else if (error.response?.data?.message === 'Invalid username. Username must be 3-20 characters long and can only contain letters, numbers, and underscores.') {
+                toast.error('Username must be 3-20 characters long and can only contain letters, numbers, and underscores.')
+            } 
+            else if (error.response?.data?.message === 'Weak password. Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.') {
+                toast.error('Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.')
             } else if (error.response?.data?.message === 'Email already exists') {
                 toast.error('Email already exists');
             } else if (error.response?.data?.message === 'Invalid OTP' || error.response?.data?.message === 'Invalid or expired OTP token') {
@@ -104,8 +109,6 @@ const Validator = ({ setIsFormVisible }) => {
                 email
             })
             setOtpToken(response.data.otpToken);
-            const decode = jwtDecod(response.data.otpToken)
-            console.log("OTP Token:", decode);
             toast.success('OTP sent to your email. Please enter the OTP to complete registration.')
         } catch (error) {
             if (error.response?.data?.message === 'Email already exists') {

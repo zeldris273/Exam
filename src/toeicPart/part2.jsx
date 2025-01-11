@@ -26,42 +26,38 @@ import question30 from '../toeicAudioAndImage/part2/question30.mp3';
 import question31 from '../toeicAudioAndImage/part2/question31.mp3';
 
 const questions = [
-    { id: 7, audio: question7, correctAnswer: 'd' },
-    { id: 8, audio: question8, correctAnswer: 'd' },
-    { id: 9, audio: question9, correctAnswer: 'd' },
-    { id: 10, audio: question10, correctAnswer: 'd' },
-    { id: 11, audio: question11, correctAnswer: 'd' },
-    { id: 12, audio: question12, correctAnswer: 'd' },
-    { id: 13, audio: question13, correctAnswer: 'd' },
-    { id: 14, audio: question14, correctAnswer: 'd' },
-    { id: 15, audio: question15, correctAnswer: 'd' },
-    { id: 16, audio: question16, correctAnswer: 'd' },
-    { id: 17, audio: question17, correctAnswer: 'd' },
-    { id: 18, audio: question18, correctAnswer: 'd' },
-    { id: 19, audio: question19, correctAnswer: 'd' },
-    { id: 20, audio: question20, correctAnswer: 'd' },
-    { id: 21, audio: question21, correctAnswer: 'd' },
-    { id: 22, audio: question22, correctAnswer: 'd' },
-    { id: 23, audio: question23, correctAnswer: 'd' },
-    { id: 24, audio: question24, correctAnswer: 'd' },
-    { id: 25, audio: question25, correctAnswer: 'd' },
-    { id: 26, audio: question26, correctAnswer: 'd' },
-    { id: 27, audio: question27, correctAnswer: 'd' },
-    { id: 28, audio: question28, correctAnswer: 'd' },
-    { id: 29, audio: question29, correctAnswer: 'd' },
-    { id: 30, audio: question30, correctAnswer: 'd' },
-    { id: 31, audio: question31, correctAnswer: 'd' }
+    { id: 7, audio: question7 },
+    { id: 8, audio: question8 },
+    { id: 9, audio: question9 },
+    { id: 10, audio: question10 },
+    { id: 11, audio: question11 },
+    { id: 12, audio: question12 },
+    { id: 13, audio: question13 },
+    { id: 14, audio: question14 },
+    { id: 15, audio: question15 },
+    { id: 16, audio: question16 },
+    { id: 17, audio: question17 },
+    { id: 18, audio: question18 },
+    { id: 19, audio: question19 },
+    { id: 20, audio: question20 },
+    { id: 21, audio: question21 },
+    { id: 22, audio: question22 },
+    { id: 23, audio: question23 },
+    { id: 24, audio: question24 },
+    { id: 25, audio: question25 },
+    { id: 26, audio: question26 },
+    { id: 27, audio: question27 },
+    { id: 28, audio: question28 },
+    { id: 29, audio: question29 },
+    { id: 30, audio: question30 },
+    { id: 31, audio: question31 }
 ]
 
-const part2 = () => {
-    const [userAnswers, setUserAnswers] = useState({})
-
+const part2 = ({ onAnswerChange }) => {
     const handleAnswerChange = (questionId, answer) => {
-        setUserAnswers((prev) => ({
-            ...prev,
-            [questionId]: answer,
-        }));
+        onAnswerChange(questionId, answer);
     };
+    
 
     return (
         <div className='m-5'>

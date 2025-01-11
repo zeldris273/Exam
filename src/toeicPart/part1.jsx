@@ -13,16 +13,18 @@ import question6 from '../toeicAudioAndImage/part1/question6.mp3'
 import p6 from '../toeicAudioAndImage/part1/p6.png'
 
 const questions = [
-    { id: 1, audio: question1, image: p1, correctAnswer: 'b' },
-    { id: 2, audio: question2, image: p2, correctAnswer: 'b' },
-    { id: 3, audio: question3, image: p3, correctAnswer: 'd' },
-    { id: 4, audio: question4, image: p4, correctAnswer: 'd' },
-    { id: 5, audio: question5, image: p5, correctAnswer: 'b' },
-    { id: 6, audio: question6, image: p6, correctAnswer: 'd' }
+    { id: 1, audio: question1, image: p1 },
+    { id: 2, audio: question2, image: p2 },
+    { id: 3, audio: question3, image: p3 },
+    { id: 4, audio: question4, image: p4 },
+    { id: 5, audio: question5, image: p5 },
+    { id: 6, audio: question6, image: p6 }
 ];
 
-const Part1 = () => {
-
+const Part1 = ({ onAnswerChange }) => {
+    const handleAnswerChange = (questionId, answer) => {
+        onAnswerChange(questionId, answer);
+    };
 
     return (
         <div className="m-5">

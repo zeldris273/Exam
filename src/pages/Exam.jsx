@@ -10,12 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
+import { useSelector, useDispatch } from 'react-redux';
+import { calculateScore, setQuestions } from '../redux/examSlice.jsx'
+import { toast } from 'react-toastify';
 
 const Exam = () => {
   const [timeLeft, setTimeLeft] = useState(120 * 60);
-  const [userAnswers, setUserAnswers] = useState({});
-  const [questions, setQuestions] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const part1Ref = useRef(null);
   const part2Ref = useRef(null);
@@ -26,10 +28,38 @@ const Exam = () => {
   const part7Ref = useRef(null);
 
   useEffect(() => {
+    const fetchUserInfo = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log("No token found, redirect to login page");
+                return;
+            }
+
+            const response = await axios.get('http://localhost:5000/api/auth/user', {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+
+            if (response.status === 204) {
+                toast.error('Bạn cần hoàn thành thông tin cá nhân trước khi luyện tập.');
+                navigate("/tests")
+            } else if (response.status === 200) {
+                navigate("/exam");
+            }
+        } catch (error) {
+            console.error('Error fetching user info:', error);
+            toast.error('Bạn cần hoàn thành thông tin cá nhân trước khi luyện tập.');
+        }
+    };
+
+    fetchUserInfo(); 
+}, []);
+
+  useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get('http://localhost:5000/questions');
-        setQuestions(response.data);
+        dispatch(setQuestions(response.data));
       } catch (error) {
         console.error('Error fetching questions:', error);
       }
@@ -79,36 +109,12 @@ const Exam = () => {
     ref.current.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleAnswerChange = (part, questionId, answer) => {
-    const optionIdentifier = answer.charAt(0);
-    setUserAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [questionId]: optionIdentifier,
-    }));
-    console.log('Updated userAnswers:', { ...userAnswers, [questionId]: optionIdentifier });  // Debugging: Print updated user answers
-  };
-
-  const calculateScore = () => {
-    let totalCorrectAnswers = 0;
-
-    console.log('Calculating score with userAnswers:', userAnswers); // Debugging: Print user answers before calculating score
-    questions.forEach((question) => {
-      const userAnswer = userAnswers[question.id];
-      console.log(`Question ID: ${question.id}, User Answer: ${userAnswer}, Correct Answer: ${question.answer}`);  // Debugging: Print each question's details
-      if (userAnswer === question.answer) {
-        totalCorrectAnswers += 1;
-      }
-    });
-
-    const totalScore = totalCorrectAnswers * 5;
-
-    return {
-      score: totalScore,
-    };
-  };
+  const score = useSelector(state => state.exam.score)
+  
 
   const handleSubmit = async () => {
-    const { score } = calculateScore();
+    dispatch(calculateScore());
+
     const token = localStorage.getItem('token');
 
     try {
@@ -129,6 +135,7 @@ const Exam = () => {
     }
   };
 
+
   return (
     <div className='flex bg-gray-200 gap-2'>
       <div className='w-[90%] bg-gray-50 ml-2'>
@@ -136,44 +143,37 @@ const Exam = () => {
 
         {/* Part 1 */}
         <div ref={part1Ref}>
-          <Part1
-            onAnswerChange={(questionId, answer) => handleAnswerChange('part1', questionId, answer)} />
+          <Part1 />
         </div>
 
         {/* Part 2 */}
         <div ref={part2Ref}>
-          <Part2
-            onAnswerChange={(questionId, answer) => handleAnswerChange('part1', questionId, answer)} />
+          <Part2 />
         </div>
 
         {/* Part 3 */}
         <div ref={part3Ref}>
-          <Part3
-            onAnswerChange={(questionId, answer) => handleAnswerChange('part1', questionId, answer)} />
+          <Part3 />
         </div>
 
         {/* Part 4 */}
         <div ref={part4Ref}>
-          <Part4
-            onAnswerChange={(questionId, answer) => handleAnswerChange('part1', questionId, answer)} />
+          <Part4 />
         </div>
 
         {/* Part 5 */}
         <div ref={part5Ref}>
-          <Part5
-            onAnswerChange={(questionId, answer) => handleAnswerChange('part1', questionId, answer)} />
+          <Part5 />
         </div>
 
         {/* Part 6 */}
         <div ref={part6Ref}>
-          <Part6
-            onAnswerChange={(questionId, answer) => handleAnswerChange('part1', questionId, answer)} />
+          <Part6 />
         </div>
 
         {/* Part 7 */}
         <div ref={part7Ref}>
-          <Part7
-            onAnswerChange={(questionId, answer) => handleAnswerChange('part1', questionId, answer)} />
+          <Part7 />
         </div>
       </div>
 

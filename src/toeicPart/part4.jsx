@@ -12,6 +12,8 @@ import question95 from '../toeicAudioAndImage/part4/question95.m4a';
 import question98 from '../toeicAudioAndImage/part4/question98.m4a';
 import p95 from '../toeicAudioAndImage/part4/p95.png';
 import p98 from '../toeicAudioAndImage/part4/p98.png';
+import { useDispatch } from 'react-redux';
+import { setAnswer, calculateScore } from '../redux/examSlice.jsx'
 
 const audioAndImage = [
   { id: 71, audio: question71 },
@@ -26,7 +28,7 @@ const audioAndImage = [
   { id: 98, audio: question98, image: p98 },
 ];
 
-const Part4 = ({ onAnswerChange }) => {
+const Part4 = () => {
   const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
@@ -37,9 +39,12 @@ const Part4 = ({ onAnswerChange }) => {
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  const handleAnswerChange = (questionId, answer) => {
-    onAnswerChange(questionId, answer);
-  };
+  const dispatch = useDispatch();
+
+    const handleAnswerChange = (questionId, answer) => {
+        dispatch(setAnswer({ questionId, answer }));
+        dispatch(calculateScore(questions));
+    };
 
   const groupedQuestions = [];
   for (let i = 71; i <= 94; i += 3) {
@@ -74,16 +79,16 @@ const Part4 = ({ onAnswerChange }) => {
                   <div className='flex flex-col'>
                     <p>{question?.content}</p>
                     <div>
-                      {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
-                        <div key={optionKey} className="mb-2">
+                      {['a', 'b', 'c', 'd'].map(key => (
+                        <div key={key} className="mb-2">
                           <label className="flex items-center">
                             <input
                               type="radio"
                               name={`answer${questionId}`}
                               className="mr-2"
-                              onChange={() => handleAnswerChange(questionId, optionKey)}
+                              onChange={() => handleAnswerChange(questionId, key)}
                             />
-                            {question?.[optionKey]}
+                            {question?.[`option_${key}`]}
                           </label>
                         </div>
                       ))}
@@ -123,16 +128,16 @@ const Part4 = ({ onAnswerChange }) => {
                 <strong className='bg-blue-100 rounded-full p-2 text-blue-600 mr-5 flex items-center justify-center w-[35px] h-[35px]'>{questionId}</strong>
                 <div className='flex flex-col'>
                   <p>{question?.content}</p>
-                  {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
-                    <div key={optionKey} className="mb-2">
+                  {['a', 'b', 'c', 'd'].map(key => (
+                    <div key={key} className="mb-2">
                       <label className="flex items-center">
                         <input
                           type="radio"
                           name={`answer${questionId}`}
                           className="mr-2"
-                          onChange={() => handleAnswerChange(questionId, optionKey)}
+                          onChange={() => handleAnswerChange(questionId, key)}
                         />
-                        {question?.[optionKey]}
+                       {question?.[`option_${key}`]}
                       </label>
                     </div>
                   ))}

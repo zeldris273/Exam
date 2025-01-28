@@ -24,6 +24,8 @@ import question28 from '../toeicAudioAndImage/part2/question28.mp3';
 import question29 from '../toeicAudioAndImage/part2/question29.mp3';
 import question30 from '../toeicAudioAndImage/part2/question30.mp3';
 import question31 from '../toeicAudioAndImage/part2/question31.mp3';
+import { useDispatch } from 'react-redux';
+import { setAnswer, calculateScore } from '../redux/examSlice.jsx'
 
 const questions = [
     { id: 7, audio: question7 },
@@ -53,9 +55,13 @@ const questions = [
     { id: 31, audio: question31 }
 ]
 
-const part2 = ({ onAnswerChange }) => {
+const part2 = () => {
+
+    const dispatch = useDispatch();
+
     const handleAnswerChange = (questionId, answer) => {
-        onAnswerChange(questionId, answer);
+        dispatch(setAnswer({ questionId, answer }));
+        dispatch(calculateScore(questions));
     };
     
 

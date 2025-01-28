@@ -1,28 +1,25 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setAnswer, calculateScore } from '../redux/examSlice.jsx'
 
-const Part5 = ({ onAnswerChange }) => {
+const Part5 = () => {
     const [questions, setQuestions] = useState([]);
-    const [userAnswers, setUserAnswers] = useState({});
 
     useEffect(() => {
         axios.get('http://localhost:5000/questions')
             .then(response => {
-                // Filter questions specific to Part 5
                 const part5Questions = response.data.filter(q => q.id >= 101 && q.id <= 140);
                 setQuestions(part5Questions);
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
+    const dispatch = useDispatch();
+
     const handleAnswerChange = (questionId, answer) => {
-        setUserAnswers(prevAnswers => ({
-            ...prevAnswers,
-            [questionId]: answer
-        }));
-        if (onAnswerChange) {
-            onAnswerChange(questionId, answer);
-        }
+        dispatch(setAnswer({ questionId, answer }));
+        dispatch(calculateScore(questions));
     };
 
     return (
@@ -40,16 +37,16 @@ const Part5 = ({ onAnswerChange }) => {
 
                         <div className='flex flex-col'>
                             <p>{question.content}</p>
-                            {['option_a', 'option_b', 'option_c', 'option_d'].map(optionKey => (
-                                <label key={optionKey} className="flex items-center mb-2">
+                            {['a', 'b', 'c', 'd'].map(key => (
+                                <label key={key} className="flex items-center mb-2">
                                     <input
                                         type='radio'
                                         name={`answer-${question.id}`}
                                         className="mr-2"
-                                        value={optionKey}
-                                        onChange={() => handleAnswerChange(question.id, optionKey)}
+                                        value={key}
+                                        onChange={() => handleAnswerChange(question.id, key)}
                                     />
-                                    {question[optionKey]}
+                                   {question?.[`option_${key}`]}
                                 </label>
                             ))}
                         </div>

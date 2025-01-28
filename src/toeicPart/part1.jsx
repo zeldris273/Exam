@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import question1 from '../toeicAudioAndImage/part1/question1.mp3'
+import { useDispatch } from 'react-redux';
+import { setAnswer, calculateScore } from '../redux/examSlice.jsx'
 import p1 from '../toeicAudioAndImage/part1/p1.png'
 import question2 from '../toeicAudioAndImage/part1/question2.mp3'
 import p2 from '../toeicAudioAndImage/part1/p2.png'
@@ -21,9 +23,13 @@ const questions = [
     { id: 6, audio: question6, image: p6 }
 ];
 
-const Part1 = ({ onAnswerChange }) => {
+const Part1 = () => {
+
+    const dispatch = useDispatch();
+
     const handleAnswerChange = (questionId, answer) => {
-        onAnswerChange(questionId, answer);
+        dispatch(setAnswer({ questionId, answer }));
+        dispatch(calculateScore(questions));
     };
 
     return (

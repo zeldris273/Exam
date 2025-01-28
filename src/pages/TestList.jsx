@@ -39,7 +39,6 @@ const TestList = () => {
     const handleStartTest = async () => {
         try {
             const token = localStorage.getItem('token');
-            const decode = jwtDecode(token)
             if (!token) {
                 console.log("No token found, redirect to login page");
                 return;
